@@ -40,14 +40,6 @@ class Tracker_t(cmd.Cmd):
         if arg == "ping":
             print("ping --client-ip --client-port")
             print()
-        
-        if arg == "download":
-            print("download --destination-folder --filename --author-ip")
-            print()
-        
-        if arg == "upload":
-            print("upload --filename")
-            print()
 
     def do_start(self, arg):
         #print("start")
@@ -69,8 +61,6 @@ class Tracker_t(cmd.Cmd):
         args = arg.split()
         if len(args) == 0:
             try:
-                # Stop server
-                # print("exit")
                 self._tracker.stop_server()
             except Exception as e:
                 print("Error: {e}")
@@ -82,6 +72,23 @@ class Tracker_t(cmd.Cmd):
     def do_list_peers(self, arg):
         print("list peers")
         #TODO
+        args = arg.split()
+        if len(args) == 0:
+            try:
+                _peer_list = self._tracker.get_list_peers()
+                if not self._tracker.is_running:
+                    print("Tracker is currently offline!!!")
+                else:
+                    if len(_peer_list) == 0:
+                        print("There are no peer connected to this tracker!!!")
+                    else:
+                        for p in _peer_list:
+                            print(p)
+            except Exception as e:
+                print("Error while listing peers: {e}")
+        else:
+            print("This command doesn't require any arguments !!!")
+            return
 
     def do_ping(self, arg):
         print("ping")

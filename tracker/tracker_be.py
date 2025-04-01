@@ -79,3 +79,6 @@ class Tracker:
             self.is_running = False
             self.serversocket.close()
             self.server_thread.join()
+    
+    def get_list_peers(self):
+        return self._peer_list
