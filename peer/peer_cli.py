@@ -1,3 +1,4 @@
+import peer.peer_be as peer
 import cmd
 
 class Peer_vt(cmd.Cmd):
@@ -63,14 +64,18 @@ class Peer_vt(cmd.Cmd):
             print("Connecting to tracker")
             self._peer.connect_server(server_ip, server_port)
         except Exception as e:
-            print(f"Lỗi khi kết nối đến tracker: {e}")
+            print("Error connecting to tracker: ",e)
 
     def do_exit(self, arg):
         print("exit")
         return True
     
     def do_list_peers(self, arg):
-        print("list peers")
+        try:
+            print("Retreiving connected peers")
+            self._peer.send_to_tracker("LIST_PEERS")
+        except Exception as e:
+            print("Error retreiving connected peers list: ", e)
     
     def do_ping(self, arg):
         print("ping")

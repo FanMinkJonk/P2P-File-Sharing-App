@@ -26,13 +26,15 @@ class Tracker:
         while True:
             try:
                 data = conn.recv(1024).decode()
-                if data == "HELLO_TRACKER":
-                    response = "HELLO_PEER"
-                    conn.sendall(response.encode())
+                print(data)
+                if data == "LIST_PEERS":
+                    print("Roger that")
+                    response = self._peer_list
+                    conn.sendall("test list".encode())
                 
                 # Todo: process at tracker side
-            except Exception:
-                print('Error occured!')
+            except Exception as e:
+                print('Error occured: ',e)
                 break
 
     # Listens for on coming connectiong
