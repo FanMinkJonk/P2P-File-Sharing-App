@@ -7,7 +7,7 @@ import peer.peer_cli as peer_vt
 
 # Tracker
 import tracker.tracker_cli as tracker_vt
-
+import tracker.tracker_be as tracker
 
 def run():
     global loop, mode
@@ -24,7 +24,8 @@ def run():
     if arg.mode == "tracker":
         #TODO
         #print("Tracker mode")
-        mode_t = tracker_vt.Tracker_t()
+        mode = tracker.Tracker()
+        mode_t = tracker_vt.Tracker_t(mode)
         
     elif arg.mode == "peer":
         #TODO

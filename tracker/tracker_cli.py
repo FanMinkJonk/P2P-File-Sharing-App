@@ -1,11 +1,14 @@
+import tracker.tracker_be as tracker
 import cmd
 
 class Tracker_t(cmd.Cmd):
     intro = "Welcome to the virtual terminal! Type 'help' to see a list of commands."
     prompt = "tracker> "
 
-    def __init__(self):
+    def __init__(self, mode):
         super().__init__()
+        assert isinstance(mode, tracker.Tracker)
+        self._tracker = mode
 
     def do_help(self, arg):
         args = arg.split()
@@ -47,12 +50,34 @@ class Tracker_t(cmd.Cmd):
             print()
 
     def do_start(self, arg):
-        print("start")
-        #TODO
+        #print("start")
+        args = arg.split()
+        if len(args) == 0:
+            try:
+                self._tracker.start_server()
+            except tracker.ServerIsRunning:
+                print("Tracker is already up and running!!")
+            except Exception as e:
+                print("Error: {e}")
+        else:
+            print("This command doesn't require any arguments !!!")
+            return
 
     def do_exit(self, arg):
-        print("exit")
+        print("Exiting...")
         #TODO
+        args = arg.split()
+        if len(args) == 0:
+            try:
+                # Stop server
+                # print("exit")
+                self._tracker.stop_server()
+            except Exception as e:
+                print("Error: {e}")
+        else:
+            print("This command doesn't require any arguments !!!")
+            return
+        return True
 
     def do_list_peers(self, arg):
         print("list peers")
