@@ -17,7 +17,7 @@ class Tracker:
         self.is_running = False
         
         # Stores a list of peers and there uploaded files
-        self._peer_list = {}
+        self._peer_list = []
 
     # New connection in a separate thread
     def new_connection(self, addr, conn):

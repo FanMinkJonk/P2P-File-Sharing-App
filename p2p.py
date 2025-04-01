@@ -3,7 +3,7 @@ import sys
 
 # Peer
 import peer.peer_cli as peer_vt
-
+import peer.peer_be as peer
 
 # Tracker
 import tracker.tracker_cli as tracker_vt
@@ -30,7 +30,8 @@ def run():
     elif arg.mode == "peer":
         #TODO
         print("Peer mode")
-        mode_t = peer_vt.Peer_vt()
+        mode = peer.Peer()
+        mode_t = peer_vt.Peer_vt(mode)
         
     try:
         mode_t.cmdloop()

@@ -4,8 +4,9 @@ class Peer_vt(cmd.Cmd):
     intro = "Welcome to the virtual terminal! Type 'help' to see a list of commands."
     prompt = "peer> "
     
-    def __init__(self):
+    def __init__(self, mode):
         super().__init__()
+        self._peer = mode
      
     def do_help(self, arg):
         args = arg.split()
@@ -49,7 +50,20 @@ class Peer_vt(cmd.Cmd):
             print()
     
     def do_connect(self, arg):
-        print("connect")
+        #print("connect")
+        args = arg.split()
+        if len(args) != 2:
+            print("Usage: connect <server ip> <server port>")
+            return
+
+        server_ip = args[0]
+        server_port = int(args[1])
+
+        try:
+            print("Connecting to tracker")
+            self._peer.connect_server(server_ip, server_port)
+        except Exception as e:
+            print(f"Lỗi khi kết nối đến tracker: {e}")
 
     def do_exit(self, arg):
         print("exit")
