@@ -2,9 +2,11 @@ import argparse
 import sys
 
 # Peer
+import peer.peer_cli as peer_vt
 
 
 # Tracker
+import tracker.tracker_cli as tracker_vt
 
 
 def run():
@@ -21,12 +23,20 @@ def run():
         print("Option must be either \'tracker\' or \'peer\' !!")
     if arg.mode == "tracker":
         #TODO
-        print("Tracker mode")
+        #print("Tracker mode")
+        mode_t = tracker_vt.Tracker_t()
         
     elif arg.mode == "peer":
         #TODO
         print("Peer mode")
+        mode_t = peer_vt.Peer_vt()
         
+    try:
+        mode_t.cmdloop()
+    except (KeyboardInterrupt, EOFError):
+        pass
+    except Exception as e:
+        print('{}:{}'.format(type(e).__name__, e))
     
         
 if __name__ == "__main__":
