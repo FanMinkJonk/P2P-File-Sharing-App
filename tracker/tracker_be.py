@@ -1,4 +1,5 @@
 import socket
+import json
 from threading import Thread
 
 # Errors Handling
@@ -25,12 +26,10 @@ class Tracker:
         
         while True:
             try:
-                data = conn.recv(1024).decode()
-                print(data)
-                if data == "LIST_PEERS":
-                    print("Roger that")
-                    response = self._peer_list
-                    conn.sendall("test list".encode())
+                request = conn.recv(1024).decode()
+                if request == "LIST_PEERS":
+                    response = json.dumps(self._peer_list)
+                    conn.sendall(response.encode())
                 
                 # Todo: process at tracker side
             except Exception as e:

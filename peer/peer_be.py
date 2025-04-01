@@ -1,5 +1,6 @@
 import socket
 import argparse
+import json
 
 from threading import Thread
 
@@ -20,5 +21,6 @@ class Peer:
             
     def send_to_tracker(self, message):
         self.client_socket.sendall(message.encode())
-        print(self.client_socket.recv(1024).decode())
-            
+        data = self.client_socket.recv(1024).decode()
+        list_peers = json.loads(data)  # Giải mã từ JSON thành list
+        return list_peers

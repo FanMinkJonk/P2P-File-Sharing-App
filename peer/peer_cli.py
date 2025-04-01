@@ -73,7 +73,15 @@ class Peer_vt(cmd.Cmd):
     def do_list_peers(self, arg):
         try:
             print("Retreiving connected peers")
-            self._peer.send_to_tracker("LIST_PEERS")
+            list_peers = self._peer.send_to_tracker("LIST_PEERS")
+            if len(list_peers) == 0:
+                print("There are no peer connected to this tracker!!!")
+            else:
+                print("")
+                print("Peer list:")
+                for i in range(len(list_peers)):
+                    print(list_peers[i][0],":",list_peers[i][1])
+                print("")
         except Exception as e:
             print("Error retreiving connected peers list: ", e)
     

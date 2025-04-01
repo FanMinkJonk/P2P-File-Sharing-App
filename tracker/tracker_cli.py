@@ -70,7 +70,7 @@ class Tracker_t(cmd.Cmd):
         return True
 
     def do_list_peers(self, arg):
-        print("list peers")
+        #print("list peers")
         #TODO
         args = arg.split()
         if len(args) == 0:
@@ -80,10 +80,14 @@ class Tracker_t(cmd.Cmd):
                     print("Tracker is currently offline!!!")
                 else:
                     if len(_peer_list) == 0:
+                        print("")
                         print("There are no peer connected to this tracker!!!")
                     else:
-                        for p in _peer_list:
-                            print(p)
+                        print("")
+                        print("Peer list:")
+                        for i in range(len(_peer_list)):
+                            print(_peer_list[i][0],":",_peer_list[i][1])
+                        print("")
             except Exception as e:
                 print("Error while listing peers: {e}")
         else:
