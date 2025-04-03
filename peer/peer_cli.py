@@ -7,6 +7,7 @@ class Peer_vt(cmd.Cmd):
     
     def __init__(self, mode):
         super().__init__()
+        assert isinstance(mode, peer.Peer)
         self._peer = mode
      
     def do_help(self, arg):
@@ -73,11 +74,11 @@ class Peer_vt(cmd.Cmd):
     def do_list_peers(self, arg):
         try:
             print("Retreiving connected peers")
-            list_peers = self._peer.send_to_tracker("LIST_PEERS")
+            print("")
+            list_peers = self._peer.get_list_peers()
             if len(list_peers) == 0:
                 print("There are no peer connected to this tracker!!!")
             else:
-                print("")
                 print("Peer list:")
                 for i in range(len(list_peers)):
                     print(list_peers[i][0],":",list_peers[i][1])

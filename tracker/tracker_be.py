@@ -26,10 +26,17 @@ class Tracker:
         
         while True:
             try:
-                request = conn.recv(1024).decode()
-                if request == "LIST_PEERS":
-                    response = json.dumps(self._peer_list)
-                    conn.sendall(response.encode())
+                pakage = conn.recv(1024).decode()
+                message = json.loads(pakage)
+                if message["type"] == "LIST_PEERS":
+                    response = {
+                        "type":"LIST_PEERS_RESPONSE",
+                        "from":self._host,
+                        "port":self._port,
+                        "data":self._peer_list
+                    }
+                    pakage = json.dumps(response)
+                    conn.sendall(pakage.encode())
                 
                 # Todo: process at tracker side
             except Exception as e:
