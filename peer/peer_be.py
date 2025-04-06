@@ -24,6 +24,13 @@ class Peer:
             message = json.loads(pakage)
             if message["type"] == "LIST_PEERS_RESPONSE":
                 self.list_peers = message["data"]
+            elif message["type"] == "PING":
+                response = {
+                    "type":"PONG",
+                    "from":self.ip_add,
+                    "port":self.port
+                }
+                self.send_to_tracker(response)
     
     def connect_server(self, host, port):
         try:
@@ -34,7 +41,7 @@ class Peer:
             listen.start()
             print("Tracker connected")
         except Exception as e:
-            print("Error, can't connect to tracker: ",e)
+            print("Error, can't connect to tracker:",e)
             
     def send_to_tracker(self, message):
         pakage = json.dumps(message)
@@ -44,7 +51,7 @@ class Peer:
         message = {
             "type":"LIST_PEERS",
             "from":self.ip_add,
-            "port":str(self.port)
+            "port":self.port
         }
         self.send_to_tracker(message)
         

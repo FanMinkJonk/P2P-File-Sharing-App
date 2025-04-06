@@ -19,6 +19,9 @@ class Tracker:
         self._peer_addrs = []
         self._peer_sockets = []
         self._peer_files = []
+        
+        # Ping to peer
+        self.ping_check = 0
 
     # Send message
     def send_to_peer(self, conn, message):
@@ -26,7 +29,7 @@ class Tracker:
         conn.sendall(package.encode())
 
     # New connection in a separate thread
-    def new_connection(self, addr, conn):
+    def listen_peer(self, addr, conn):
         self._peer_addrs.append(addr)
         self._peer_sockets.append(conn)
         while True:
@@ -38,9 +41,11 @@ class Tracker:
                         "type":"LIST_PEERS_RESPONSE",
                         "from":self._host,
                         "port":self._port,
-                        "data":self._peer_addr
+                        "data":self._peer_addrs
                     }
                     self.send_to_peer(conn, response)
+                elif message["type"] == "PONG":
+                    self.ping_check = 1
                     
             except Exception as e:
                 print('Error occured: ',e)
@@ -56,7 +61,7 @@ class Tracker:
         while self.is_running:
             try:
                 clientsocket, addr = self.serversocket.accept()
-                nconn = Thread(target = self.new_connection, args = (addr, clientsocket), daemon=True)
+                nconn = Thread(target = self.listen_peer, args = (addr, clientsocket), daemon=True)
                 nconn.start()
             except OSError:
                 continue
@@ -95,3 +100,15 @@ class Tracker:
     # Get connected peer's ip address list
     def get_list_peers(self):
         return self._peer_addrs
+
+    # Ping to peer
+    def ping(self, peer_index):
+        message = {
+            "type":"PING",
+            "from":self._host,
+            "port":self._port
+        }
+        self.send_to_peer(self._peer_sockets[peer_index], message)
+        while self.ping_check == 0:
+            pass
+        return self.ping_check

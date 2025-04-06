@@ -81,7 +81,7 @@ class Peer_vt(cmd.Cmd):
             else:
                 print("Peer list:")
                 for i in range(len(list_peers)):
-                    print(list_peers[i][0],":",list_peers[i][1])
+                    print(i+1, list_peers[i][0],":",list_peers[i][1])
                 print("")
         except Exception as e:
             print("Error retreiving connected peers list: ", e)

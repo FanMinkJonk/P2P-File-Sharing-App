@@ -95,5 +95,25 @@ class Tracker_t(cmd.Cmd):
             return
 
     def do_ping(self, arg):
-        print("ping")
+        # print("ping")
         #TODO
+        args = arg.split()
+        if len(args) == 1:
+            try:
+                _peer_list = self._tracker.get_list_peers()
+                if not self._tracker.is_running:
+                    print("Tracker is currently offline!!!")
+                elif len(_peer_list) == 0:
+                    print("There are no peer connected to this tracker!!!")
+                else:
+                    check = self._tracker.ping(int(args[0])-1)
+                    if check:
+                        print("")
+                        print(f"Succesfully ping to {self._tracker._peer_addrs[int(args[0])-1][0]}:{self._tracker._peer_addrs[int(args[0])-1][1]}")
+                        print("")
+                    self._tracker.ping_check = 0
+            except Exception as e:
+                print("Error while ping to peer: ",e)
+        else:
+            print("Usage: ping <peer_index>")
+            return
