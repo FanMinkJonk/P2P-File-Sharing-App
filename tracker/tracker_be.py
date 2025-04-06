@@ -8,22 +8,27 @@ class ServerIsRunning(ConnectionError):
 
 class Tracker:
     def __init__(self):
+        # Tracker's ip:port
         self._host = ""
         self._port = -1
 
-        self.server = None
-        self.writer = set()
-
-        # Check if server is running
+        # Check if tracker is running
         self.is_running = False
         
         # Stores a list of peers and there uploaded files
-        self._peer_list = []
+        self._peer_addrs = []
+        self._peer_sockets = []
+        self._peer_files = []
+
+    # Send message
+    def send_to_peer(self, conn, message):
+        package = json.dumps(message)
+        conn.sendall(package.encode())
 
     # New connection in a separate thread
     def new_connection(self, addr, conn):
-        self._peer_list.append(addr)
-        
+        self._peer_addr.append(addr)
+        self._peer_socket.append(conn)
         while True:
             try:
                 pakage = conn.recv(1024).decode()
@@ -33,12 +38,10 @@ class Tracker:
                         "type":"LIST_PEERS_RESPONSE",
                         "from":self._host,
                         "port":self._port,
-                        "data":self._peer_list
+                        "data":self._peer_addr
                     }
-                    pakage = json.dumps(response)
-                    conn.sendall(pakage.encode())
-                
-                # Todo: process at tracker side
+                    self.send_to_peer(conn, response)
+                    
             except Exception as e:
                 print('Error occured: ',e)
                 break
@@ -82,11 +85,13 @@ class Tracker:
         else:
             raise ServerIsRunning
 
+    # Stop server
     def stop_server(self):
         if self.is_running == True:
             self.is_running = False
             self.serversocket.close()
             self.server_thread.join()
     
+    # Get connected peer's ip address list
     def get_list_peers(self):
-        return self._peer_list
+        return self._peer_addr
