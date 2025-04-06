@@ -68,21 +68,29 @@ class Peer_vt(cmd.Cmd):
             print("Error connecting to tracker: ",e)
 
     def do_exit(self, arg):
-        print("exit")
-        return True
+        try:
+            print("Exiting...")
+            self._peer.exit()
+            print()
+            return True
+        except Exception as e:
+            print(f"Error while exiting: {e}")
     
     def do_list_peers(self, arg):
         try:
-            print("Retreiving connected peers")
-            print("")
-            list_peers = self._peer.get_list_peers()
-            if len(list_peers) == 0:
-                print("There are no peer connected to this tracker!!!")
+            if self._peer.is_connected:
+                print("Retreiving connected peers")
+                print()
+                list_peers = self._peer.get_list_peers()
+                if len(list_peers) == 0:
+                    print("There are no peer connected to this tracker!!!")
+                else:
+                    print("Peer list:")
+                    for i in range(len(list_peers)):
+                        print(i+1, list_peers[i][0],":",list_peers[i][1])
+                    print()
             else:
-                print("Peer list:")
-                for i in range(len(list_peers)):
-                    print(i+1, list_peers[i][0],":",list_peers[i][1])
-                print("")
+                print("This peer is not connected to any tracker")
         except Exception as e:
             print("Error retreiving connected peers list: ", e)
     

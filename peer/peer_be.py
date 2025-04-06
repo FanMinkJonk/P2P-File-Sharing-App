@@ -31,6 +31,10 @@ class Peer:
                     "port":self.port
                 }
                 self.send_to_tracker(response)
+            elif message["type"] == "TRACKER_EXIT":
+                self.client_socket.close()
+                self.is_connected = False
+                break
     
     def connect_server(self, host, port):
         try:
@@ -58,3 +62,14 @@ class Peer:
         while self.list_peers==None:
             pass
         return self.list_peers
+
+    def exit(self):
+        if self.is_connected:
+            message = {
+                "type":"PEER_EXIT",
+                "from":self.ip_add,
+                "port":self.port
+            }
+            self.send_to_tracker(message)
+            self.client_socket.close()
+            self.is_connected = False

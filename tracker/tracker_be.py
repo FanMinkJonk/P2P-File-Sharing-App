@@ -35,20 +35,27 @@ class Tracker:
         while True:
             try:
                 pakage = conn.recv(1024).decode()
-                message = json.loads(pakage)
-                if message["type"] == "LIST_PEERS":
-                    response = {
-                        "type":"LIST_PEERS_RESPONSE",
-                        "from":self._host,
-                        "port":self._port,
-                        "data":self._peer_addrs
-                    }
-                    self.send_to_peer(conn, response)
-                elif message["type"] == "PONG":
-                    self.ping_check = 1
+                if pakage:
+                    message = json.loads(pakage)
+                    if message["type"] == "LIST_PEERS":
+                        response = {
+                            "type":"LIST_PEERS_RESPONSE",
+                            "from":self._host,
+                            "port":self._port,
+                            "data":self._peer_addrs
+                        }
+                        self.send_to_peer(conn, response)
+                    elif message["type"] == "PONG":
+                        self.ping_check = 1
+                    elif message["type"] == "PEER_EXIT":
+                        self._peer_addrs.remove(addr)
+                        self._peer_sockets.remove(conn)
+                        break
                     
+            except socket.error:
+                pass
             except Exception as e:
-                print('Error occured: ',e)
+                print(f'Error occured while listening to peer {addr} :',e)
                 break
 
     # Listens for on coming connectiong
@@ -94,6 +101,13 @@ class Tracker:
     def stop_server(self):
         if self.is_running == True:
             self.is_running = False
+            message = {
+                "type":"TRACKER_EXIT",
+                "from":self._host,
+                "port":self._port
+            }
+            for i in range(len(self._peer_sockets)):
+                self.send_to_peer(self._peer_sockets[i], message)
             self.serversocket.close()
             self.server_thread.join()
     

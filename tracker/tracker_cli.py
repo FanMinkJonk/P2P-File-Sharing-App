@@ -63,7 +63,7 @@ class Tracker_t(cmd.Cmd):
             try:
                 self._tracker.stop_server()
             except Exception as e:
-                print("Error: {e}")
+                print("Error when exiting:",e)
         else:
             print("This command doesn't require any arguments !!!")
             return
@@ -113,7 +113,9 @@ class Tracker_t(cmd.Cmd):
                         print("")
                     self._tracker.ping_check = 0
             except Exception as e:
+                print()
                 print("Error while ping to peer: ",e)
+                print()
         else:
             print("Usage: ping <peer_index>")
             return
