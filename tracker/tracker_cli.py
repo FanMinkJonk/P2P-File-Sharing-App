@@ -86,7 +86,7 @@ class Tracker_t(cmd.Cmd):
                         print("")
                         print("Peer list:")
                         for i in range(len(_peer_list)):
-                            print(_peer_list[i][0],":",_peer_list[i][1])
+                            print(i+1, _peer_list[i][0],":",_peer_list[i][1])
                         print("")
             except Exception as e:
                 print("Error while listing peers: {e}")
