@@ -27,8 +27,8 @@ class Tracker:
 
     # New connection in a separate thread
     def new_connection(self, addr, conn):
-        self._peer_addr.append(addr)
-        self._peer_socket.append(conn)
+        self._peer_addrs.append(addr)
+        self._peer_sockets.append(conn)
         while True:
             try:
                 pakage = conn.recv(1024).decode()
@@ -94,4 +94,4 @@ class Tracker:
     
     # Get connected peer's ip address list
     def get_list_peers(self):
-        return self._peer_addr
+        return self._peer_addrs
