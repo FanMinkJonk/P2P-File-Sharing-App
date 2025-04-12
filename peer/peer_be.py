@@ -91,9 +91,13 @@ class Peer:
             print(f"[ERROR] Upload failed: {e}")
 
 # Download file từ metadata torrent
-    def download_file(self, torrent_filename):
+    def download_file(self, filename):
         try:
-            torrent_path = os.path.join("metadata", torrent_filename)
+            # Tự động thêm đuôi .torrent.json nếu người dùng chỉ nhập tên file
+            if not filename.endswith(".torrent.json"):
+                filename += ".torrent.json"
+
+            torrent_path = os.path.join("metadata", filename)
             with open(torrent_path, 'r') as f:
                 metadata = json.load(f)
 
