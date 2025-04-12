@@ -1,5 +1,5 @@
 import os
-from utils import split_file_to_pieces, save_metadata
+from torrent import split_file_to_pieces, save_metadata
 import socket
 import argparse
 import json
