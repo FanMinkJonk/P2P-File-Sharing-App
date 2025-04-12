@@ -18,8 +18,8 @@ class Peer_vt(cmd.Cmd):
                 "exit":"exit terminal",
                 "list_peers":"display a list of connected peers",
                 "ping":"ping to a specific ip address",
-                "download":"download a specified file",
-                "upload":"upload a specified file",
+                "download <filename>":"download a specified file",
+                "upload <filename>":"upload a specified file",
                 "help <command>":"display the command syntax"
             }
             print("\nList of command :")
