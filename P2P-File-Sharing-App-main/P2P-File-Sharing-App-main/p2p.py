@@ -19,16 +19,20 @@ def run():
     arg = arg_parser.parse_args()
     
     if num_args != 1:
+        print()
         print("Invalid input")
         print("Option must be either \'tracker\' or \'peer\' !!")
+        print()
     if arg.mode == "tracker":
         #TODO
-        #print("Tracker mode")
+        print()
+        print("Tracker mode")
         mode = tracker.Tracker()
         mode_t = tracker_vt.Tracker_t(mode)
         
     elif arg.mode == "peer":
         #TODO
+        print()
         print("Peer mode")
         mode = peer.Peer()
         mode_t = peer_vt.Peer_vt(mode)

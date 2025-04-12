@@ -42,7 +42,7 @@ class Tracker:
                             "type":"LIST_PEERS_RESPONSE",
                             "from":self._host,
                             "port":self._port,
-                            "data":self._peer_addrs
+                            "data":[self._peer_addrs, self._peer_files]
                         }
                         self.send_to_peer(conn, response)
                     elif message["type"] == "PONG":
@@ -51,7 +51,14 @@ class Tracker:
                         self._peer_addrs.remove(addr)
                         self._peer_sockets.remove(conn)
                         break
-                    
+                    elif message["type"] == "PEER_UPLOAD":
+                        metainfo = {
+                            "author":[message["from"], message["port"]],
+                            "file name":message["data"][0],
+                            "file size":message["data"][1],
+                        }
+                        self._peer_files.append(metainfo)
+                                            
             except socket.error:
                 pass
             except Exception as e:
@@ -126,3 +133,4 @@ class Tracker:
         while self.ping_check == 0:
             pass
         return self.ping_check
+

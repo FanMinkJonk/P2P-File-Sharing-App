@@ -1,15 +1,16 @@
 import socket
 import argparse
 import json
+import os
+import shutil
 
+
+from transfer.download import download_file
 from threading import Thread
 
 from transfer.upload import UploadServer
 import threading
 
-# Errors Handling
-class CantGetList(Exception):
-    pass
 
 class Peer:
     def __init__(self):
@@ -19,14 +20,18 @@ class Peer:
         self.port = -1
         
         # Shared memory
-        self.list_peers = None
+        self.list_peers = []
+        self.list_peers_files = []
+        self.list_peers_receive = 0
         
     def listen_tracker(self):
         while self.is_connected:
             pakage = self.client_socket.recv(1024).decode()
             message = json.loads(pakage)
             if message["type"] == "LIST_PEERS_RESPONSE":
-                self.list_peers = message["data"]
+                self.list_peers = message["data"][0]
+                self.list_peers_files = message["data"][1]
+                self.list_peers_receive = 1
             elif message["type"] == "PING":
                 response = {
                     "type":"PONG",
@@ -40,15 +45,14 @@ class Peer:
                 break
     
     def connect_server(self, host, port):
-        try:
-            self.client_socket.connect((host, port))
-            self.ip_add, self.port = self.client_socket.getsockname()
-            self.is_connected = True
-            listen = Thread(target=self.listen_tracker, daemon=True)
-            listen.start()
-            print("Tracker connected")
-        except Exception as e:
-            print("Error, can't connect to tracker:",e)
+        self.client_socket.connect((host, port))
+        self.ip_add, self.port = self.client_socket.getsockname()
+        self.is_connected = True
+        listen = Thread(target=self.listen_tracker, daemon=True)
+        listen.start()
+        print()
+        print("Tracker connected")
+        print()
             
     def send_to_tracker(self, message):
         pakage = json.dumps(message)
@@ -62,9 +66,29 @@ class Peer:
         }
         self.send_to_tracker(message)
         
-        while self.list_peers==None:
+        while self.list_peers_receive == 0:
             pass
-        return self.list_peers
+        self.list_peers_receive = 0
+        return (self.list_peers, self.list_peers_files)
+
+    def upload(self, filepath, destination_folder):
+        file_name = os.path.basename(filepath)
+        file_size = os.path.getsize(filepath)
+        message = {
+            "type":"PEER_UPLOAD",
+            "from":self.ip_add,
+            "port":self.port,
+            "data":[file_name, file_size]
+        }
+        self.send_to_tracker(message)
+        
+        # Ensure the destination folder exists; if not, create it
+        if not os.path.exists(destination_folder):
+            os.makedirs(destination_folder)
+        
+        # Copy the file into the shared folder
+        shutil.copy(filepath, destination_folder)
+        return 1
 
     def exit(self):
         if self.is_connected:
