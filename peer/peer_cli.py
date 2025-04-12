@@ -98,10 +98,36 @@ class Peer_vt(cmd.Cmd):
         print("ping")
     
     def do_download(self, arg):
-        print("download")
+        args = arg.split()
+        if len(args) != 1:
+            print("Usage: download <torrent_file>")
+            return
+
+        filename = args[0]
+        if not self._peer.is_connected:
+            print("Please connect to a tracker first.")
+            return
+
+        try:
+            self._peer.download_file(filename)
+        except Exception as e:
+            print(f"Error during download: {e}")
     
     def do_upload(self, arg):
-        print("upload")
+        args = arg.split()
+        if len(args) != 1:
+            print("Usage: upload <filename>")
+            return
+
+        filename = args[0]
+        if not self._peer.is_connected:
+            print("Please connect to a tracker first.")
+            return
+
+        try:
+            self._peer.upload_file(filename)
+        except Exception as e:
+            print(f"Error during upload: {e}")
 
 # if __name__ == "__main__":
 #     Peer_vt.cmdloop()
