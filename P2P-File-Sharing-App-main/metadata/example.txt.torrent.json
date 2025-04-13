@@ -1,0 +1,10 @@
+{
+    "filename": "example.txt",
+    "piece_size": 5242,
+    "num_pieces": 1,
+    "pieces": [
+        {
+            "index": 0
+        }
+    ]
+}
