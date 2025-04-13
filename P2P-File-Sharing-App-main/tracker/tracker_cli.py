@@ -17,7 +17,7 @@ class Tracker_t(cmd.Cmd):
                 "start":"start listening for incoming connection.",
                 "exit":"exit terminal.",
                 "list_peers":"display a list of connected peers.",
-                "ping":"ping to a specific ip address.",
+                "ping <peer_index>":"ping to a specific ip address.",
                 "help <command>":"display the command syntax."
             }
             print()

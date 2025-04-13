@@ -22,12 +22,12 @@ class Peer_vt(cmd.Cmd):
                 "connect": "connect to a tracker.",
                 "exit": "exit terminal.",
                 "list_peers": "display a list of connected peers.",
-                "ping": "ping to a specific ip address.",
+                "ping <peer_index>": "ping to a specific ip address.",
                 "download <filename> <author-ip>": "download a specified file.",
                 "upload <filename>": "upload a specified file.",
-                "download torrent <file_name> <ip>": "download a file using torrent (metadata required).",
-                "create torrent <file_name> <piece_size>": "create torrent metadata for a file.",
-                "download magnet <magnet_link> <seed_ip>": "download a file using magnet text.",
+                "download_torrent <file_name> <ip>": "download a file using torrent (metadata required).",
+                "create_torrent <file_name> <piece_size>": "create torrent metadata for a file.",
+                "download_magnet <magnet_link> <seed_ip>": "download a file using magnet text.",
                 "magnet_text <magnet_text> <tracker_url> <seed_ip>": "fetch metadata from tracker and download file using magnet text.",
                 "help <command>": "display the command syntax."
             }
@@ -155,19 +155,33 @@ class Peer_vt(cmd.Cmd):
     
     def do_ping(self, arg):
         args = arg.split()
-        if len(args) != 1:
-            print("\nUsage: ping <peer-index>\n")
+        if len(args) == 1:
+            try:
+                list_peers, list_peers_files = self._peer.get_list_peers()
+                if not self._peer.is_connected:
+                    print()
+                    print("This peer is not currently connected to any tracker!!!")
+                    print()
+                elif len(list_peers) == 0:
+                    print()
+                    print("There are no peer connected to this tracker!!!")
+                    print()
+                else:
+                    check = self._peer.ping(int(args[0])-1)
+                    if check:
+                        print()
+                        print(f"Succesfully ping to {list_peers[int(args[0])-1][0]}:{list_peers[int(args[0])-1][1]}")
+                        print()
+                    self._peer._peer_ping_check = 0
+            except Exception as e:
+                print()
+                print("Error while ping to peer: ",e)
+                print()
+        else:
+            print()
+            print("Usage: ping <peer-index>")
+            print()
             return
-        try:
-            peer_index = int(args[0])
-        except ValueError:
-            print("\nError: peer-index must be an integer.\n")
-            return
-        try:
-            result = self._peer.ping(peer_index)
-            print(f"\nPing response from peer {peer_index}: {result}\n")
-        except Exception as e:
-            print(f"\nError pinging peer {peer_index}: {e}\n")
     
     def do_download(self, arg):
         args = arg.split()
@@ -245,7 +259,7 @@ class Peer_vt(cmd.Cmd):
     def do_download_torrent(self, arg):
         args = arg.split()
         if len(args) != 2:
-            print("\nUsage: download torrent <file_name> <ip>\n")
+            print("\nUsage: download_torrent <file_name> <ip>\n")
             return
         file_name, seed_ip = args
         destination_folder = "downloaded_files"
@@ -288,7 +302,7 @@ class Peer_vt(cmd.Cmd):
     def do_create_torrent(self, arg):
         args = arg.split()
         if len(args) != 2:
-            print("\nUsage: create torrent <file_name> <piece_size>\n")
+            print("\nUsage: create_torrent <file_name> <piece_size>\n")
             return
         file_name, piece_size_str = args
         try:
@@ -326,7 +340,7 @@ class Peer_vt(cmd.Cmd):
         import urllib.parse
         args = arg.split()
         if len(args) != 2:
-            print("\nUsage: download magnet <magnet_link> <seed_ip>\n")
+            print("\nUsage: download_magnet <magnet_link> <seed_ip>\n")
             return
         magnet_link, seed_ip = args
         # Parse the magnet link
@@ -375,7 +389,7 @@ class Peer_vt(cmd.Cmd):
     def do_show_magnet(self, arg):
         args = arg.split()
         if len(args) != 1:
-            print("\nUsage: show magnet <file_name>\n")
+            print("\nUsage: show_magnet <file_name>\n")
             return
         file_name = args[0]
         metadata_file = os.path.join("metadata", f"{file_name}.torrent.json")
@@ -400,7 +414,7 @@ class Peer_vt(cmd.Cmd):
     def do_show_magnet(self, arg):
         args = arg.split()
         if len(args) != 1:
-            print("\nUsage: show magnet <file_name>\n")
+            print("\nUsage: show_magnet <file_name>\n")
             return
         file_name = args[0]
         metadata_file = os.path.join("metadata", f"{file_name}.torrent.json")

@@ -35,7 +35,7 @@ class UploadServer:
             self.server_socket.bind((self.host, self.port))
             self.server_socket.listen(5)
             self.server_running = True
-            print(f"Upload server listening on {self.host}:{self.port}")
+            # print(f"Upload server listening on {self.host}:{self.port}")
             while self.server_running:
                 try:
                     client_socket, client_addr = self.server_socket.accept()
@@ -150,7 +150,11 @@ class UploadServer:
                             client_socket.sendall(chunk)
                             remaining -= len(chunk)
                     print(f"Sent piece {piece_index} of file '{filename}' successfully.")
-
+                elif request.get("type") == "PEER_PING":
+                    response = {
+                        "type": "PEER_PONG"
+                    }
+                    client_socket.sendall(response)
                 else:
                     print("Unknown request type received.")
             client_socket.close()
