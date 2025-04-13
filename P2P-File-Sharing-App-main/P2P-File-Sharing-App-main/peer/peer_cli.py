@@ -86,6 +86,7 @@ class Peer_vt(cmd.Cmd):
         try:
             print("Connecting to tracker")
             self._peer.connect_server(server_ip, server_port)
+            print("Tracker connected")
         except Exception as e:
             print(f"Error connecting to tracker:{e}")
         print()
@@ -166,6 +167,8 @@ class Peer_vt(cmd.Cmd):
         try:
             if self._peer.upload(filepath, destination_folder):
                 print(f"File '{filepath}' uploaded successfully to '{destination_folder}'.")
+            else:
+                print(f"File '{filepath}' has already been uploaded to tracker!")
         except Exception as e:
             print("Error during file upload:", e)
         

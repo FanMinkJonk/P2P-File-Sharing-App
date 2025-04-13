@@ -53,22 +53,18 @@ class Tracker_t(cmd.Cmd):
     def do_start(self, arg):
         #print("start")
         args = arg.split()
+        print()
         if len(args) == 0:
             try:
                 self._tracker.start_server()
             except tracker.ServerIsRunning:
-                print()
                 print("Tracker is already up and running!!")
-                print()
             except Exception as e:
-                print()
                 print("Error: {e}")
-                print()
         else:
-            print()
             print("This command doesn't require any arguments !!!")
-            print()
             return
+        print()
 
     def do_exit(self, arg):
         print()

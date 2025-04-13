@@ -57,7 +57,21 @@ class Tracker:
                             "file name":message["data"][0],
                             "file size":message["data"][1],
                         }
-                        self._peer_files.append(metainfo)
+                        if metainfo in self._peer_files:
+                            response = {
+                                "type":"THIS_FILE_HAS_ALREADY_BEEN_UPLOADED",
+                                "from":self._host,
+                                "port":self._port,
+                            }
+                            self.send_to_peer(conn, response)
+                        else:
+                            self._peer_files.append(metainfo)
+                            response = {
+                                "type":"TRACKER_HAS_RECEIVED_YOUR_FILE",
+                                "from":self._host,
+                                "port":self._port,
+                            }
+                            self.send_to_peer(conn, response)
                                             
             except socket.error:
                 pass

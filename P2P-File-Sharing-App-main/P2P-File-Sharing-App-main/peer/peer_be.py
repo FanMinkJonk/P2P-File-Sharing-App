@@ -18,31 +18,50 @@ class Peer:
         self.is_connected = False
         self.ip_add = ""
         self.port = -1
+        self.upload_server = UploadServer(port=22237, files_folder="shared_files")
+        threading.Thread(target=self.upload_server.start, daemon=True).start()
         
         # Shared memory
         self.list_peers = []
         self.list_peers_files = []
-        self.list_peers_receive = 0
+        self._peers_receive = 0
+        self._tracker_sent = ""
         
     def listen_tracker(self):
-        while self.is_connected:
-            pakage = self.client_socket.recv(1024).decode()
-            message = json.loads(pakage)
-            if message["type"] == "LIST_PEERS_RESPONSE":
-                self.list_peers = message["data"][0]
-                self.list_peers_files = message["data"][1]
-                self.list_peers_receive = 1
-            elif message["type"] == "PING":
-                response = {
-                    "type":"PONG",
-                    "from":self.ip_add,
-                    "port":self.port
-                }
-                self.send_to_tracker(response)
-            elif message["type"] == "TRACKER_EXIT":
-                self.client_socket.close()
-                self.is_connected = False
-                break
+        try:
+            while self.is_connected:
+                pakage = self.client_socket.recv(1024).decode()
+                if not pakage:
+                    self.is_connected = False
+                    break
+                message = json.loads(pakage)
+                if message["type"] == "LIST_PEERS_RESPONSE":
+                    self.list_peers = message["data"][0]
+                    self.list_peers_files = message["data"][1]
+                    self._peers_receive = 1
+                elif message["type"] == "PING":
+                    response = {
+                        "type":"PONG",
+                        "from":self.ip_add,
+                        "port":self.port
+                    }
+                    self.send_to_tracker(response)
+                elif message["type"] == "THIS_FILE_HAS_ALREADY_BEEN_UPLOADED":
+                    self._peers_receive = 1
+                    self._tracker_sent = message["type"]
+                elif message["type"] == "TRACKER_HAS_RECEIVED_YOUR_FILE":
+                    self._peers_receive = 1
+                    self._tracker_sent = message["type"]
+                elif message["type"] == "TRACKER_EXIT":
+                    self.client_socket.close()
+                    self.is_connected = False
+                    break
+        except OSError as e:
+            if e.winerror != 10053:
+                print(f"Error receiving data from tracker [OSError]: {e}")
+            pass
+        except Exception as e:
+            print(f"Error receiving data from tracker: {e}")
     
     def connect_server(self, host, port):
         self.client_socket.connect((host, port))
@@ -50,9 +69,6 @@ class Peer:
         self.is_connected = True
         listen = Thread(target=self.listen_tracker, daemon=True)
         listen.start()
-        print()
-        print("Tracker connected")
-        print()
             
     def send_to_tracker(self, message):
         pakage = json.dumps(message)
@@ -82,13 +98,20 @@ class Peer:
         }
         self.send_to_tracker(message)
         
-        # Ensure the destination folder exists; if not, create it
-        if not os.path.exists(destination_folder):
-            os.makedirs(destination_folder)
+        while self._peers_receive == 0:
+            pass
         
-        # Copy the file into the shared folder
-        shutil.copy(filepath, destination_folder)
-        return 1
+        self._peers_receive = 0
+        if self._tracker_sent == "TRACKER_HAS_RECEIVED_YOUR_FILE":
+            # Ensure the destination folder exists; if not, create it
+            if not os.path.exists(destination_folder):
+                os.makedirs(destination_folder)
+            
+            # Copy the file into the shared folder
+            shutil.copy(filepath, destination_folder)
+            return 1
+        elif self._tracker_sent == "THIS_FILE_HAS_ALREADY_BEEN_UPLOADED":
+            return 0
 
     def exit(self):
         if self.is_connected:
@@ -98,19 +121,20 @@ class Peer:
                 "port":self.port
             }
             self.send_to_tracker(message)
-            self.client_socket.close()
+            self.upload_server.stop()
             self.is_connected = False
+            self.client_socket.close()
 
 ############################################################################################
-def start_upload_for_peer(peer_instance):
-    peer_instance.upload_server = UploadServer(port=22237, files_folder="shared_files")
-    # Start the upload server in a separate daemon thread
-    threading.Thread(target=peer_instance.upload_server.start, daemon=True).start()
+# def start_upload_for_peer(peer_instance):
+#     peer_instance.upload_server = UploadServer(port=22237, files_folder="shared_files")
+#     # Start the upload server in a separate daemon thread
+#     threading.Thread(target=peer_instance.upload_server.start, daemon=True).start()
 
-# Save the original __init__ if it exists.
-if hasattr(Peer, '__init__'):
-    original_init = Peer.__init__
-    def new_init(self, *args, **kwargs):
-        original_init(self, *args, **kwargs)
-        start_upload_for_peer(self)
-    Peer.__init__ = new_init
+# # Save the original __init__ if it exists.
+# if hasattr(Peer, '__init__'):
+#     original_init = Peer.__init__
+#     def new_init(self, *args, **kwargs):
+#         original_init(self, *args, **kwargs)
+#         start_upload_for_peer(self)
+#     Peer.__init__ = new_init

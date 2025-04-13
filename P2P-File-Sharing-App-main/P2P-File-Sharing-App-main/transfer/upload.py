@@ -43,6 +43,8 @@ class UploadServer:
                     # Handle each client connection in a separate thread
                     thread = Thread(target=self.handle_client, args=(client_socket,), daemon=True)
                     thread.start()
+                except socket.error:
+                    pass
                 except Exception as e:
                     print(f"Error accepting connection: {e}")
         except Exception as e:
@@ -100,7 +102,7 @@ class UploadServer:
         #Stops the upload server.
         self.server_running = False
         self.server_socket.close()
-        print("Upload server stopped.")
+        # print("Upload server stopped.")
 
 if __name__ == "__main__":
     import argparse
