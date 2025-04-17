@@ -14,36 +14,46 @@ class Tracker_t(cmd.Cmd):
         args = arg.split()
         if len(args) == 0:
             commands = {
-                "start":"start listening for income",
-                "exit":"exit terminal",
-                "list_peers":"display a list of connected peers",
-                "ping":"ping to a specific ip address",
-                "help <command>":"display the command syntax"
+                "start":"start listening for incoming connection.",
+                "exit":"exit terminal.",
+                "list_peers":"display a list of connected peers.",
+                "ping <peer_index>":"ping to a specific ip address.",
+                "help <command>":"display the command syntax."
             }
-            print("\nList of command :")
+            print()
+            print("~~ Help menu ~~")
             for cmd, desc in commands.items():
                 print(f"  {cmd:10} - {desc}")
             print()
             
         if arg == "start":
+            print()
             print("start")
+            print("This command doesn\'t require any argument")
             print()
             
         if arg == "exit":
+            print()
             print("exit")
+            print("This command doesn\'t require any argument.")
             print()
         
         if arg == "list_peers":
+            print()
             print("list_peers")
+            print("This command doesn\'t require any argument.")
             print()
         
         if arg == "ping":
-            print("ping --client-ip --client-port")
+            print()
+            print("ping <peer_index>")
+            print("<peer-index>: The index of a peer in connected peers list.")
             print()
 
     def do_start(self, arg):
-        #print("start")
         args = arg.split()
+        
+        print()
         if len(args) == 0:
             try:
                 self._tracker.start_server()
@@ -54,10 +64,12 @@ class Tracker_t(cmd.Cmd):
         else:
             print("This command doesn't require any arguments !!!")
             return
+        print()
 
     def do_exit(self, arg):
+        print()
         print("Exiting...")
-        #TODO
+        
         args = arg.split()
         if len(args) == 0:
             try:
@@ -67,12 +79,14 @@ class Tracker_t(cmd.Cmd):
         else:
             print("This command doesn't require any arguments !!!")
             return
+        print()
+        
         return True
 
     def do_list_peers(self, arg):
-        #print("list peers")
-        #TODO
         args = arg.split()
+        
+        print()
         if len(args) == 0:
             try:
                 _peer_list = self._tracker.get_list_peers()
@@ -80,24 +94,25 @@ class Tracker_t(cmd.Cmd):
                     print("Tracker is currently offline!!!")
                 else:
                     if len(_peer_list) == 0:
-                        print("")
                         print("There are no peer connected to this tracker!!!")
                     else:
-                        print("")
                         print("Peer list:")
                         for i in range(len(_peer_list)):
                             print(i+1, _peer_list[i][0],":",_peer_list[i][1])
-                        print("")
+                            for p in self._tracker._peer_files:
+                                if p["author"][0] == _peer_list[i][0] and p["author"][1] == _peer_list[i][1]:
+                                    print(f"  - File name: {p['file name']}, file size: {p['file size']}KB")
             except Exception as e:
-                print("Error while listing peers: {e}")
+                print(f"Error while listing peers: {e}")
         else:
             print("This command doesn't require any arguments !!!")
             return
+        print()
 
     def do_ping(self, arg):
-        # print("ping")
-        #TODO
         args = arg.split()
+        
+        print()
         if len(args) == 1:
             try:
                 _peer_list = self._tracker.get_list_peers()
@@ -108,14 +123,10 @@ class Tracker_t(cmd.Cmd):
                 else:
                     check = self._tracker.ping(int(args[0])-1)
                     if check:
-                        print("")
                         print(f"Succesfully ping to {self._tracker._peer_addrs[int(args[0])-1][0]}:{self._tracker._peer_addrs[int(args[0])-1][1]}")
-                        print("")
                     self._tracker.ping_check = 0
             except Exception as e:
-                print()
-                print("Error while ping to peer: ",e)
-                print()
+                print(f"Error while ping to peer: {e}")
         else:
             print("Usage: ping <peer_index>")
-            return
+        print()
