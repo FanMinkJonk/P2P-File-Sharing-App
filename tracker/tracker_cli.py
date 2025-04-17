@@ -12,6 +12,7 @@ class Tracker_t(cmd.Cmd):
 
     def do_help(self, arg):
         args = arg.split()
+        print()
         if len(args) == 0:
             commands = {
                 "start":"start listening for incoming connection.",
@@ -20,39 +21,25 @@ class Tracker_t(cmd.Cmd):
                 "ping <peer_index>":"ping to a specific ip address.",
                 "help <command>":"display the command syntax."
             }
-            print()
             print("~~ Help menu ~~")
             for cmd, desc in commands.items():
                 print(f"  {cmd:10} - {desc}")
-            print()
-            
-        if arg == "start":
-            print()
+        elif arg == "start":
             print("start")
             print("This command doesn\'t require any argument")
-            print()
-            
-        if arg == "exit":
-            print()
+        elif arg == "exit":
             print("exit")
             print("This command doesn\'t require any argument.")
-            print()
-        
-        if arg == "list_peers":
-            print()
+        elif arg == "list_peers":
             print("list_peers")
             print("This command doesn\'t require any argument.")
-            print()
-        
-        if arg == "ping":
-            print()
+        elif arg == "ping":
             print("ping <peer_index>")
             print("<peer-index>: The index of a peer in connected peers list.")
-            print()
+        print()
 
     def do_start(self, arg):
         args = arg.split()
-        
         print()
         if len(args) == 0:
             try:
@@ -69,7 +56,6 @@ class Tracker_t(cmd.Cmd):
     def do_exit(self, arg):
         print()
         print("Exiting...")
-        
         args = arg.split()
         if len(args) == 0:
             try:
