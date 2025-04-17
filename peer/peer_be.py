@@ -1,12 +1,12 @@
 import socket
-import argparse
 import json
 
 from threading import Thread
 
 # Errors Handling
-class CantGetList(Exception):
-    pass
+class PeerNotFound(Exception):
+    def __init__(self, message="The index you provided doesn't valid"):
+        super().__init__(message)
 
 class Peer:
     def __init__(self):
@@ -82,6 +82,37 @@ class Peer:
             pass
         self.list_peers_receive = 0
         return (self.list_peers, self.list_peers_files)
+
+    def ping(self, peer_index):
+        try:
+            target_peer = (self.list_peers[peer_index - 1][0], 22237)  # 1-indexed
+        except IndexError:
+            raise PeerNotFound
+        try:
+            message = { 
+                "type": "PEER_PING",
+                "from":self.ip_add,
+                "port":self.port
+            }
+            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+            s.connect(target_peer)  # target_peer is a tuple (ip, port)
+            s.sendall((json.dumps(message)).encode())
+            response_data = s.recv(1024).decode()
+            while not response_data:
+                pass
+            message = json.loads(response_data)
+            response = {
+                "type": "PONG_RECEIVED",
+                "from":self.ip_add,
+                "port":self.port
+            }
+            s.sendall((json.dumps(response)).encode())
+            if message["type"] == "PEER_PONG":
+                return 1
+            else:
+                return 0
+        except Exception as e:
+            print(f"Error while ping to peer: {e}")
 
     def exit(self):
         if self.is_connected:
