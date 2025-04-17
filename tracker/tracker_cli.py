@@ -44,10 +44,8 @@ class Tracker_t(cmd.Cmd):
         if len(args) == 0:
             try:
                 self._tracker.start_server()
-            except tracker.ServerIsRunning:
-                print("Tracker is already up and running!!")
             except Exception as e:
-                print("Error: {e}")
+                print(f"Error when powering tracker: {e}")
         else:
             print("This command doesn't require any arguments !!!")
             return
@@ -75,7 +73,7 @@ class Tracker_t(cmd.Cmd):
         print()
         if len(args) == 0:
             try:
-                _peer_list = self._tracker.get_list_peers()
+                _peer_list = self._tracker._peer_addrs
                 if not self._tracker.is_running:
                     print("Tracker is currently offline!!!")
                 else:
@@ -101,7 +99,7 @@ class Tracker_t(cmd.Cmd):
         print()
         if len(args) == 1:
             try:
-                _peer_list = self._tracker.get_list_peers()
+                _peer_list = self._tracker._peer_addrs
                 if not self._tracker.is_running:
                     print("Tracker is currently offline!!!")
                 elif len(_peer_list) == 0:
