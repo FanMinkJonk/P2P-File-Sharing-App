@@ -1,7 +1,11 @@
 import socket
 import json
 
+from peer.download import download_file
 from threading import Thread
+
+from peer.upload import UploadServer
+import threading
 
 # Errors Handling
 class PeerNotFound(Exception):
@@ -14,6 +18,8 @@ class Peer:
         self.is_connected = False
         self.ip_add = ""
         self.port = -1
+        self.upload_server = UploadServer(port=22237, files_folder="shared_files")
+        threading.Thread(target=self.upload_server.start, daemon=True).start()
         
         # Shared memory
         self.list_peers = []
